@@ -31,4 +31,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/icon_search" />
 
+    <Button
+        android:id="@+id/locationTestButton"
+        android:layout_width="166dp"
+        android:layout_height="53dp"
+        android:text="위치 받아오기"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.449" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -106,6 +106,6 @@
         app:layout_constraintHorizontal_bias="0.942"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/icon_apply" />
+        app:srcCompat="@mipmap/icon_apply" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
