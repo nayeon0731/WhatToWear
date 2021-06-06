@@ -21,8 +21,8 @@ public class GpsTracker extends Service implements LocationListener {
 
     private final Context mContext;
     Location location;
-    double latitude;
-    double longitude;
+    int latitude;
+    int longitude;
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10;
     private static final long MIN_TIME_BW_UPDATES = 1000*60*1;
@@ -57,8 +57,8 @@ public class GpsTracker extends Service implements LocationListener {
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                         if (location != null) {
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
+                            latitude = (int) location.getLatitude();
+                            longitude = (int) location.getLongitude();
                         }
                     }
                 }
@@ -68,8 +68,8 @@ public class GpsTracker extends Service implements LocationListener {
                         if(locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
+                                latitude = (int) location.getLatitude();
+                                longitude = (int) location.getLongitude();
                             }
                         }
                     }
@@ -83,14 +83,14 @@ public class GpsTracker extends Service implements LocationListener {
 
     public double getLatitude() {
         if (location != null) {
-            latitude = location.getLatitude();
+            latitude = (int) location.getLatitude();
         }
         return latitude;
     }
 
     public double getLongitude() {
         if (location != null) {
-            longitude = location.getLongitude();
+            longitude = (int) location.getLongitude();
         }
         return longitude;
     }

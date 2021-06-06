@@ -15,22 +15,38 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private GpsTracker gpsTracker;
+    String key = "";
+
+    ArrayList<WeatherInfoData> widArray = new ArrayList<WeatherInfoData>();
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -43,7 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton searchButton = (ImageButton)findViewById(R.id.searchButton);
         ImageButton settingButton = (ImageButton)findViewById(R.id.settingButton);
+        TextView resultView = (TextView)findViewById(R.id.resultview);
 
+        //검색 아이콘 클릭
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //설정 아이콘
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,13 +90,125 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 gpsTracker = new GpsTracker(MainActivity.this);
 
-                double latitude = gpsTracker.getLatitude();
-                double longitude = gpsTracker.getLongitude();
+                int latitude = (int) gpsTracker.getLatitude();
+                int longitude = (int) gpsTracker.getLongitude();
 
                 String address = getCurrentAddress(latitude, longitude);
                 Toast.makeText(MainActivity.this, "현재위치 \n위도" + latitude + "경도 " + longitude, Toast.LENGTH_LONG).show();
             }
         });
+
+        showWeather();
+    }
+
+    void showWeather() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getXmlData();
+
+                Log.d("여기는 런"," 12시 온도는?? " + widArray.get(2).getTempature() + " 입니다." );
+
+            }
+        }).start();
+    }
+    //파싱
+    void getXmlData() {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+        String getDate = sdf.format(date);
+
+        String queryUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=" + key + "&numOfRows=100&pageNo=1&base_date=" + getDate + "&base_time=0200&nx=51&ny=38";
+        Log.v("태그", "url" + queryUrl);
+
+        //파싱할때만 쓰이는 임시 items
+        //ArrayList<Item> tmpItmes = new ArrayList<Item>();
+        try {
+            URL url = null;
+
+            url = new URL(queryUrl);
+            InputStream is = url.openStream();
+
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser xpp = factory.newPullParser();
+            xpp.setInput(new InputStreamReader(is, "UTF-8"));
+
+
+            Log.v("태그", "api 전송후");
+
+            xpp.next();
+            int eventType = xpp.getEventType();
+            int count=0;
+            String category="";
+            WeatherInfoData wid = new WeatherInfoData(0,0,0,0,0);
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                String tag;
+
+
+
+                switch (eventType) {
+                    case XmlPullParser.START_DOCUMENT:
+                        break;
+                    case XmlPullParser.START_TAG:
+
+                        tag = xpp.getName();
+
+                        if (tag.equals("category")) {
+                            // 카테고리다 팝이면 새거 아니면 값을 가져오쟈
+                            xpp.next();
+                            category = xpp.getText();
+                            Log.d("api테스트", "카테고리 : " + category);
+                            if(category.equals("POP")){
+                                Log.d("------","팝나와따" + count);
+                                count = count + 1;
+                                if(count > 1){
+                                    Log.d("여기는 배열에 추가하기 전","비확률" + wid.getRainP());
+                                    Log.d("여기는 배열에 추가하기 전","습도" + wid.getHumidity());
+                                    Log.d("여기는 배열에 추가하기 전","날씨" + wid.getSky());
+                                    Log.d("여기는 배열에 추가하기 전","기온" + wid.getTempature());
+                                    Log.d("여기는 배열에 추가하기 전","풍속" + wid.getWindSpeed());
+
+                                    widArray.add(wid);
+                                }
+                                //wid = new WeatherInfoData(0,0,0,0,0);
+                                Log.d("------","팝나오고 이프문 지났다");
+                            }
+                        } else if (tag.equals("fcstValue")) {
+                            // 값이다 어딘가 저장하자
+                            xpp.next();
+                            String stringValue = xpp.getText();
+                            double doubleValue = Double.parseDouble(stringValue);
+                            Log.d("값 출력해봄 ","" + category + " : " + doubleValue);
+                            if(category.equals("POP")){
+                                wid.setRainP((int)doubleValue);
+                            }else if(category.equals("REH")){
+                                wid.setHumidity((int)doubleValue);
+                            }else if(category.equals("SKY")){
+                                wid.setSky((int)doubleValue);
+                            }else if(category.equals("T3H")){
+                                wid.setTempature((int)doubleValue);
+                            }else if(category.equals("WSD")){
+                                wid.setWindSpeed(doubleValue);
+                            }
+                        }
+                        break;
+                    case XmlPullParser.END_TAG:
+                        tag = xpp.getName();
+                        if (tag.equals("item")){
+                            // 아이템 하나 끝
+                            //tmpItmes.add(new Item(hospitalName, hospitalAddr)); //api로 받아온 정보 객체로 저장. 이거를 itemArrayList에 저장.
+                        }
+                        break;
+                }
+                eventType = xpp.next();
+            }
+
+        } catch(Exception e){
+            Log.v("태그", "e = " + e);
+        }
+        //임시 아이템을 items에게 넘겨줌
+        //itemArrayList = tmpItmes;
     }
 
     /*
@@ -156,7 +287,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public String getCurrentAddress( double latitude, double longitude) {
+    public String getCurrentAddress( int latitude, int longitude) {
 
         //지오코더... GPS를 주소로 변환
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
