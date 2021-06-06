@@ -107,7 +107,16 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 getXmlData();
 
-                Log.d("여기는 런"," 12시 온도는?? " + widArray.get(2).getTempature() + " 입니다." );
+
+                for(int i = 0; i<widArray.size(); i++){
+                    Log.d("여기는 런", "i = " + i);
+                    Log.d("여기는 런"," 강수확률? " + widArray.get(i).getRainP() + " 입니다." );
+                    Log.d("여기는 런"," 습도? " + widArray.get(i).getHumidity() + " 입니다." );
+                    Log.d("여기는 런"," 구름? " + widArray.get(i).getSky() + " 입니다." );
+                    Log.d("여기는 런"," 온도? " + widArray.get(i).getTempature() + " 입니다." );
+                    Log.d("여기는 런"," 풍속? " + widArray.get(i).getWindSpeed() + " 입니다." );
+                    Log.d("여기는 런"," 날씨? " + widArray.get(i).getRain() + " 입니다." );
+                }
 
             }
         }).start();
@@ -116,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
     void getXmlData() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
+        Log.d("시간", "현재 시간 : " +  date.getTime());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String getDate = sdf.format(date);
 
@@ -141,12 +151,12 @@ public class MainActivity extends AppCompatActivity {
             int eventType = xpp.getEventType();
             int count=0;
             String category="";
-            WeatherInfoData wid = new WeatherInfoData(0,0,0,0,0);
+            int rainP = 0, humidity = 0, sky = 0, tempature = 0, rain = 0;
+            double windSpeed = 0;
+
+
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String tag;
-
-
-
                 switch (eventType) {
                     case XmlPullParser.START_DOCUMENT:
                         break;
@@ -163,33 +173,42 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("------","팝나와따" + count);
                                 count = count + 1;
                                 if(count > 1){
-                                    Log.d("여기는 배열에 추가하기 전","비확률" + wid.getRainP());
-                                    Log.d("여기는 배열에 추가하기 전","습도" + wid.getHumidity());
-                                    Log.d("여기는 배열에 추가하기 전","날씨" + wid.getSky());
-                                    Log.d("여기는 배열에 추가하기 전","기온" + wid.getTempature());
-                                    Log.d("여기는 배열에 추가하기 전","풍속" + wid.getWindSpeed());
+                                    Log.d("여기는 배열에 추가하기 전","비확률" + rainP);
+                                    Log.d("여기는 배열에 추가하기 전","습도" + humidity);
+                                    Log.d("여기는 배열에 추가하기 전","날씨" + sky);
+                                    Log.d("여기는 배열에 추가하기 전","기온" + tempature);
+                                    Log.d("여기는 배열에 추가하기 전","풍속" + windSpeed);
+                                    Log.d("여기는 배열에 추가하기 전","풍속" + rain);
 
-                                    widArray.add(wid);
+                                    widArray.add(new WeatherInfoData(sky,humidity,tempature,rainP,windSpeed,rain));
                                 }
-                                //wid = new WeatherInfoData(0,0,0,0,0);
-                                Log.d("------","팝나오고 이프문 지났다");
+                                rainP = 0;
+                                humidity = 0;
+                                sky = 0;
+                                tempature = 0;
+                                rain = 0;
+                                windSpeed = 0;
+
                             }
                         } else if (tag.equals("fcstValue")) {
                             // 값이다 어딘가 저장하자
                             xpp.next();
                             String stringValue = xpp.getText();
-                            double doubleValue = Double.parseDouble(stringValue);
-                            Log.d("값 출력해봄 ","" + category + " : " + doubleValue);
+
+                            Log.d("값 출력해봄 ","" + category + " : " + stringValue);
                             if(category.equals("POP")){
-                                wid.setRainP((int)doubleValue);
+                                rainP = Integer.parseInt(stringValue);
                             }else if(category.equals("REH")){
-                                wid.setHumidity((int)doubleValue);
+                                humidity = Integer.parseInt(stringValue);
                             }else if(category.equals("SKY")){
-                                wid.setSky((int)doubleValue);
+                                sky =  Integer.parseInt(stringValue);
                             }else if(category.equals("T3H")){
-                                wid.setTempature((int)doubleValue);
+                                tempature =  Integer.parseInt(stringValue);
+                            }else if(category.equals("PTY")){
+                                rain =  Integer.parseInt(stringValue);
                             }else if(category.equals("WSD")){
-                                wid.setWindSpeed(doubleValue);
+                                double doubleValue = Double.parseDouble(stringValue);
+                                windSpeed = doubleValue;
                             }
                         }
                         break;
@@ -209,6 +228,37 @@ public class MainActivity extends AppCompatActivity {
         }
         //임시 아이템을 items에게 넘겨줌
         //itemArrayList = tmpItmes;
+    }
+
+    //날씨 배경 바꾸는 함수
+    void chageBackground() {
+        long now = System.currentTimeMillis();
+        Date date = new Date(now);
+        SimpleDateFormat sdf = new SimpleDateFormat("hh");
+        String getDate = sdf.format(date);
+
+        int nowHour = Integer.parseInt(getDate);
+        int result = nowHour / 3 -1;
+        if(result < 0){
+            result = 0;
+        }
+        WeatherInfoData nowData = widArray.get(result);
+        //비 오는지 안오는지 체크
+        if(nowData.getRain() == 0){ //비가 안올때
+            switch (nowData.getSky()){
+                case 1:
+                    //날씨 맑음 하늘색
+                    break;
+                case 3:
+                    //구름 많음 흐림보다는 밝은색
+                    break;
+                case 4:
+                    //흐림 회색
+                    break;
+            }
+        } else {
+            //비가 옴 회색
+        }
     }
 
     /*

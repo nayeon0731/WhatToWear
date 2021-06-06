@@ -1,15 +1,16 @@
 package com.example.whattowear;
 
 public class WeatherInfoData {
-    public int sky, tempature, rainP, humidity;
+    public int sky, tempature, rainP, humidity, rain;
     public double windSpeed;
 
-    public WeatherInfoData(int sky, int humidity, int tempature, int rainP, double windSpeed) {
+    public WeatherInfoData(int sky, int humidity, int tempature, int rainP, double windSpeed, int rain) {
         this.sky = sky;
         this.humidity = humidity;
         this.tempature = tempature;
         this.rainP = rainP;
         this.windSpeed = windSpeed;
+        this.rain = rain;
     }
 
     public int getSky() {
@@ -32,6 +33,8 @@ public class WeatherInfoData {
         return windSpeed;
     }
 
+    public int getRain() { return rain; }
+
     public void setSky(int sky) {
         this.sky = sky;
     }
@@ -51,4 +54,6 @@ public class WeatherInfoData {
     public void setWindSpeed(double windSpeed) {
         this.windSpeed = windSpeed;
     }
+
+    public void setRain(int rain) { this.rain = rain; }
 }
