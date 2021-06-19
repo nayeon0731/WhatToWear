@@ -3,6 +3,7 @@ package com.example.whattowear;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,6 +13,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.LocationManager;
@@ -59,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         ImageButton searchButton = (ImageButton)findViewById(R.id.searchButton);
         ImageButton settingButton = (ImageButton)findViewById(R.id.settingButton);
-        TextView resultView = (TextView)findViewById(R.id.resultview);
+
 
         //검색 아이콘 클릭
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                 startActivity(intent);
+
+
             }
         });
 
@@ -99,14 +103,18 @@ public class MainActivity extends AppCompatActivity {
         });
 
         showWeather();
+
     }
 
     void showWeather() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                getXmlData();
+                TextView rainView = (TextView)findViewById(R.id.rainView);
+                TextView rainPView = (TextView)findViewById(R.id.rainPView);
+                TextView tempView = (TextView)findViewById(R.id.tempView);
 
+                getXmlData();
 
                 for(int i = 0; i<widArray.size(); i++){
                     Log.d("여기는 런", "i = " + i);
@@ -118,6 +126,25 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("여기는 런"," 날씨? " + widArray.get(i).getRain() + " 입니다." );
                 }
 
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        long now = System.currentTimeMillis();
+                        Date date = new Date(now);
+                        SimpleDateFormat sdf = new SimpleDateFormat("HH");
+                        String getDate = sdf.format(date);
+                        int nowHour = Integer.parseInt(getDate);
+                        int result = nowHour / 3 -1;
+                        if(result < 0){
+                            result = 0;
+                        }
+
+                        rainPView.setText(Integer.toString(widArray.get(result).getRainP()));
+                        tempView.setText(Integer.toString(widArray.get(result).getTempature()));
+                        rainView.setText(Integer.toString(widArray.get(result).getRain()));
+                        changeBackground();
+                    }
+                });
             }
         }).start();
     }
@@ -231,10 +258,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //날씨 배경 바꾸는 함수
-    void chageBackground() {
+    void changeBackground() {
         long now = System.currentTimeMillis();
         Date date = new Date(now);
-        SimpleDateFormat sdf = new SimpleDateFormat("hh");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH");
         String getDate = sdf.format(date);
 
         int nowHour = Integer.parseInt(getDate);
@@ -245,15 +272,23 @@ public class MainActivity extends AppCompatActivity {
         WeatherInfoData nowData = widArray.get(result);
         //비 오는지 안오는지 체크
         if(nowData.getRain() == 0){ //비가 안올때
+            ConstraintLayout background;
+            background = (ConstraintLayout)findViewById(R.id.activity_main);
             switch (nowData.getSky()){
                 case 1:
                     //날씨 맑음 하늘색
+                    int skyBlue = ContextCompat.getColor(this, R.color.skyBlue);
+                    background.setBackgroundColor(skyBlue);
                     break;
                 case 3:
                     //구름 많음 흐림보다는 밝은색
+                    int lightSkyBlue = ContextCompat.getColor(this, R.color.lightSkyBlue);
+                    background.setBackgroundColor(lightSkyBlue);
                     break;
                 case 4:
                     //흐림 회색
+                    int grey = ContextCompat.getColor(this, R.color.grey);
+                    background.setBackgroundColor(grey);
                     break;
             }
         } else {
