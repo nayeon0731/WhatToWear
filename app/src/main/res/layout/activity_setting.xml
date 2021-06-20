@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:text="성별"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/radioGroup"
+        app:layout_constraintBottom_toTopOf="@+id/radioGroup1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.215"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,7 +32,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <RadioGroup
-        android:id="@+id/radioGroup"
+        android:id="@+id/radioGroup1"
         android:layout_width="194dp"
         android:layout_height="65dp"
         android:layout_marginTop="150dp"
@@ -70,6 +70,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
+        android:id="@+id/radioGroup2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@+id/submitButton"

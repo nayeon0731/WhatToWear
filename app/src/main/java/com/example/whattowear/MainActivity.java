@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     ArrayList<WeatherInfoData> widArray = new ArrayList<WeatherInfoData>();
     ArrayList<WeatherInfoData> itemViewArrayList = new ArrayList<WeatherInfoData>();
+
+
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -155,7 +158,10 @@ public class MainActivity extends AppCompatActivity {
                         rainPView.setText(widArray.get(result).getRainP()+"%");
                         tempView.setText(widArray.get(result).getTempature()+"℃");
                         rainView.setText(weatherCodeToString(widArray.get(result)));
+
                         changeBackground();
+
+                        recommendClothes(widArray.get(result));
 
                         Log.d("TAG", "ㄴㅇㄹㄴㅇㄹㄴㅇㄹㄹㄴㅇ");
 
@@ -323,6 +329,32 @@ public class MainActivity extends AppCompatActivity {
 
     //의상 추천해주는 함수
     void recommendClothes(WeatherInfoData wd) {
+        ImageView clothes1 = findViewById(R.id.clothes1);
+        ImageView clothes2 = findViewById(R.id.clothes2);
+        ImageView clothes3 = findViewById(R.id.clothes3);
+
+        Intent receiveIntent = getIntent();
+        int sex = receiveIntent.getIntExtra("성별",0);
+        int rUCold = receiveIntent.getIntExtra("선호도",0);
+        int[] defaultTemp = {1,0,-1};
+
+        if (wd.getTempature() <= defaultTemp[0]+(rUCold*3)) {
+            //청바지
+            clothes1.setImageResource(R.drawable.jeans);
+
+        } else if (wd.getTempature() <= defaultTemp[1]+(rUCold*3)) {
+            //가디건, 슬랙스
+            clothes1.setImageResource(R.drawable.cardigan);
+            clothes2.setImageResource(R.drawable.slacks);
+        } else if (wd.getTempature() <= defaultTemp[2]+(rUCold*3)) {
+            //반팔, 와이드
+            clothes1.setImageResource(R.drawable.shortshirt);
+            clothes2.setImageResource(R.drawable.widepants);
+        } else {
+            //린넨, 반바지
+            clothes1.setImageResource(R.drawable.linen);
+            clothes2.setImageResource(R.drawable.shortspants);
+        }
 
     }
 
