@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView rainView = (TextView)findViewById(R.id.rainView);
                 TextView rainPView = (TextView)findViewById(R.id.rainPView);
                 TextView tempView = (TextView)findViewById(R.id.tempView);
+                TextView commentView = (TextView)findViewById(R.id.commentView);
 
                 getXmlData();
                 for(int i = 0; i<widArray.size(); i++){
@@ -163,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
 
                         recommendClothes(widArray.get(result));
 
+                        String tip = weatherTip(widArray.get(result));
+                        commentView.setText(tip);
+
+
                         Log.d("TAG", "ㄴㅇㄹㄴㅇㄹㄴㅇㄹㄹㄴㅇ");
 
 
@@ -186,7 +191,8 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String getDate = sdf.format(date);
 
-        String queryUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=" + key + "&numOfRows=90&pageNo=1&base_date=" + getDate + "&base_time=0200&nx=51&ny=38";
+//        String queryUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=" + key + "&numOfRows=90&pageNo=1&base_date=" + getDate + "&base_time=0200&nx=51&ny=38";
+        String queryUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=" + key + "&numOfRows=90&pageNo=1&base_date=20210620&base_time=0200&nx=51&ny=38";
         Log.v("akjsdfh", "url" + queryUrl);
 
         //파싱할때만 쓰이는 임시 items
@@ -336,7 +342,9 @@ public class MainActivity extends AppCompatActivity {
         Intent receiveIntent = getIntent();
         int sex = receiveIntent.getIntExtra("성별",0);
         int rUCold = receiveIntent.getIntExtra("선호도",0);
-        int[] defaultTemp = {1,0,-1};
+        int[] defaultTemp = {10,18,23};
+
+        Log.d("의상추천", "recommendClothes: 지금의 온도는?" + wd.getTempature());
 
         if (wd.getTempature() <= defaultTemp[0]+(rUCold*3)) {
             //청바지
@@ -388,6 +396,64 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return "";
+    }
+
+    String weatherTip(WeatherInfoData wd) {
+        String tip = "";
+        String weather = weatherCodeToString(wd);
+        int temp = wd.getTempature();
+        int humid = wd.getHumidity();
+        int rain = wd.getRain();
+        double wind = wd.getWindSpeed();
+
+        //기온에 따른 메세지
+        if(temp > 30){
+            tip += "기온이 높습니다. 선크림을 챙기세요\n";
+        }else if(temp > 20){
+            tip += "날씨가 포근하여 가벼운 옷차림이 좋을 것 같네요\n";
+        }else if(temp > 10){
+            tip += "날씨가 선선합니다. 외투 하나 챙기시면 좋을거 같아요\n";
+        }else{
+            tip += "날씨가 매우 춥습니다. 감기조심하세요\n";
+        }
+
+        //습도에 따른 메세지
+        if(humid > 80){
+            tip += "매우 습합니다\n";
+        }else if(humid > 50){
+            //그저그럼
+            tip += "적당한 습도입니다\n";
+        }else if(humid > 0){
+            //건조하당
+            tip += "건조한 날씨에 목관리 주의하세요\n";
+        }
+
+        //비에 따른 메시지
+        if(rain == 1) { //비
+            tip += "비가 와요. 우산을 챙기세요\n";
+        } else if(rain ==3) { //눈
+            tip += "눈이 내려요. 따뜻하게 입으세요.\n";
+        } else if(rain ==4) { //소나기
+            tip += "소나기가 내려요. 비 조심하세요.\n";
+        } else if(rain ==5) { //빗방울
+            tip += "빗방울이 떨어져요. 휴대용 우산을 챙기세요.\n";
+        }
+
+        //날씨에 따른 메세지
+        switch (weather) {
+            case "맑음":
+                tip += "구름 없이 맑은 하늘이에요\n";
+                break;
+            case "구름많음":
+                tip += "구름이 많아요";
+                break;
+            case "흐림":
+                tip += "날이 흐려요";
+                break;
+        }
+
+
+        return tip;
     }
 
     /*

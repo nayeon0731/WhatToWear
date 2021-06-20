@@ -64,9 +64,9 @@ public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.
     public void onBindViewHolder(WeatherViewAdapter.ViewHolder holder, int position) {
         WeatherInfoData weatherInfo = itemViewArrayList.get(position);
         Log.d("되라제발", "onBindViewHolder: 여기는 온바인드");
-        holder.tempItemView.setText(Integer.toString(weatherInfo.getTempature()) );
-        holder.rainItemView.setText(Integer.toString(weatherInfo.getRain()));
-        holder.timeItemView.setText(Integer.toString(weatherInfo.getTime()));
+        holder.tempItemView.setText(weatherInfo.getTempature() + "℃" );
+        holder.rainItemView.setText(weatherCodeToString(weatherInfo));
+        holder.timeItemView.setText(weatherInfo.getTime() + "시");
 
     }
 
@@ -74,5 +74,36 @@ public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.
     @Override
     public int getItemCount() {
         return itemViewArrayList.size();
+    }
+
+    String weatherCodeToString(WeatherInfoData wd){
+        if(wd.getRain() == 0){
+            switch (wd.getSky()) {
+                case 1:
+                    return "맑음";
+                case 3:
+                    return "구름\n많음";
+                case 4:
+                    return "흐림";
+            }
+        }else{
+            switch (wd.getRain()){
+                case 1:
+                    return "비";
+                case 2:
+                    return "비/눈";
+                case 3:
+                    return "눈";
+                case 4:
+                    return "소나기";
+                case 5:
+                    return "빗방울";
+                case 6:
+                    return "빗방울/눈날림";
+                case 7:
+                    return "눈날림";
+            }
+        }
+        return "";
     }
 }
