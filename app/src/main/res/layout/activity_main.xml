@@ -20,10 +20,11 @@
 
     <ImageButton
         android:id="@+id/searchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="66dp"
+        android:layout_height="56dp"
         android:layout_marginTop="16dp"
         android:background="#00FFFFFF"
+
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.953"
         app:layout_constraintStart_toStartOf="parent"
@@ -34,10 +35,11 @@
         android:id="@+id/locationTestButton"
         android:layout_width="166dp"
         android:layout_height="53dp"
-        android:alpha="0"
         android:background="#00FFFFFF"
-        android:text="위치 받아오기"
-        android:textColor="#00FFFFFF"
+        android:text="뭐 입지?"
+        android:textSize="30dp"
+        android:textColor="@color/black"
+        android:fontFamily="@font/the_oegyeinseolmyeongseo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
@@ -49,8 +51,8 @@
         android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
-        android:background="@color/white1"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/layout_background"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
@@ -105,9 +107,9 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/weatherList"
-        android:layout_width="368dp"
+        android:layout_width="382dp"
         android:layout_height="108dp"
-        android:background="@color/white1"
+        android:background="@drawable/layout_background"
         android:orientation="horizontal"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -137,7 +139,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white1"
+        android:background="@drawable/layout_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.551"
@@ -175,21 +177,23 @@
         app:layout_constraintHorizontal_bias="0.111"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
-        app:layout_constraintVertical_bias="0.132" />
+        app:layout_constraintVertical_bias="0.091" />
 
     <TextView
         android:id="@+id/commentView"
-        android:layout_width="350dp"
+        android:layout_width="382dp"
         android:layout_height="94dp"
+        android:background="@drawable/layout_background"
+        android:paddingHorizontal="5dp"
+        android:paddingTop="5dp"
         android:hint="오늘의 팁"
-        android:textSize="15dp"
-        android:background="@color/white1"
+        android:textSize="17dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.655"
+        app:layout_constraintHorizontal_bias="0.551"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tipView"
-        app:layout_constraintVertical_bias="0.133" />
+        app:layout_constraintVertical_bias="0.091" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
