@@ -68,9 +68,10 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.weatherList) ;
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)) ;
 
-        // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
-        WeatherViewAdapter adapter = new WeatherViewAdapter(widArray) ;
-        recyclerView.setAdapter(adapter) ;
+        WeatherViewAdapter adapter = new WeatherViewAdapter(widArray);
+//        Log.d("아아 너무길명 안되넹", "getXmlData: " + adapter.getItemCount());
+        recyclerView.setAdapter(adapter);
+
 
         //검색 아이콘 클릭
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -78,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SearchActivity.class);
                 startActivity(intent);
-
-
             }
         });
 
@@ -124,10 +123,6 @@ public class MainActivity extends AppCompatActivity {
                 TextView tempView = (TextView)findViewById(R.id.tempView);
 
                 getXmlData();
-
-                WeatherViewAdapter adapter = new WeatherViewAdapter(widArray);
-                recyclerView.setAdapter(adapter);
-
                 for(int i = 0; i<widArray.size(); i++){
                     Log.d("여기는 런", "i = " + i);
                     Log.d("여기는 런"," 강수확률? " + widArray.get(i).getRainP() + " 입니다." );
@@ -136,7 +131,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("여기는 런"," 온도? " + widArray.get(i).getTempature() + " 입니다." );
                     Log.d("여기는 런"," 풍속? " + widArray.get(i).getWindSpeed() + " 입니다." );
                     Log.d("여기는 런"," 날씨? " + widArray.get(i).getRain() + " 입니다." );
+                    Log.d("여기는 런"," 시간? " + widArray.get(i).getTime() + " 입니다." );
+
                 }
+
+
 
 
                 runOnUiThread(new Runnable() {
@@ -153,9 +152,9 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         //메인 날씨 보여주기
-                        rainPView.setText(Integer.toString(widArray.get(result).getRainP()));
-                        tempView.setText(Integer.toString(widArray.get(result).getTempature()));
-                        rainView.setText(Integer.toString(widArray.get(result).getRain()));
+                        rainPView.setText(widArray.get(result).getRainP()+"%");
+                        tempView.setText(widArray.get(result).getTempature()+"℃");
+                        rainView.setText(weatherCodeToString(widArray.get(result)));
                         changeBackground();
 
                         Log.d("TAG", "ㄴㅇㄹㄴㅇㄹㄴㅇㄹㄹㄴㅇ");
@@ -181,8 +180,8 @@ public class MainActivity extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String getDate = sdf.format(date);
 
-        String queryUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=" + key + "&numOfRows=100&pageNo=1&base_date=" + getDate + "&base_time=0200&nx=51&ny=38";
-        Log.v("태그", "url" + queryUrl);
+        String queryUrl = "http://apis.data.go.kr/1360000/VilageFcstInfoService/getVilageFcst?serviceKey=" + key + "&numOfRows=90&pageNo=1&base_date=" + getDate + "&base_time=0200&nx=51&ny=38";
+        Log.v("akjsdfh", "url" + queryUrl);
 
         //파싱할때만 쓰이는 임시 items
         //ArrayList<Item> tmpItmes = new ArrayList<Item>();
@@ -203,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
             int eventType = xpp.getEventType();
             int count=0;
             String category="";
-            int rainP = 0, humidity = 0, sky = 0, tempature = 0, rain = 0;
+            int rainP = 0, humidity = 0, sky = 0, tempature = 0, rain = 0, time = 3;
             double windSpeed = 0;
 
 
@@ -232,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                                     Log.d("여기는 배열에 추가하기 전","풍속" + windSpeed);
                                     Log.d("여기는 배열에 추가하기 전","풍속" + rain);
 
-                                    widArray.add(new WeatherInfoData(sky,humidity,tempature,rainP,windSpeed,rain));
+                                    widArray.add(new WeatherInfoData(sky,humidity,tempature,rainP,windSpeed,rain,time));
                                 }
                                 rainP = 0;
                                 humidity = 0;
@@ -240,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                                 tempature = 0;
                                 rain = 0;
                                 windSpeed = 0;
+                                time+=3;
 
                             }
                         } else if (tag.equals("fcstValue")) {
@@ -274,6 +274,9 @@ public class MainActivity extends AppCompatActivity {
                 eventType = xpp.next();
             }
 
+            WeatherViewAdapter adapter = new WeatherViewAdapter(widArray);
+            Log.d("아아 너무길명 안되넹", "getXmlData: " + adapter.getItemCount());
+            recyclerView.setAdapter(adapter);
         } catch(Exception e){
             Log.v("태그", "e = " + e);
         }
@@ -316,6 +319,43 @@ public class MainActivity extends AppCompatActivity {
         } else {
             //비가 옴 회색
         }
+    }
+
+    //의상 추천해주는 함수
+    void recommendClothes(WeatherInfoData wd) {
+
+    }
+
+    //날씨알림.
+    String weatherCodeToString(WeatherInfoData wd){
+        if(wd.getRain() == 0){
+            switch (wd.getSky()) {
+                case 1:
+                    return "맑음";
+                case 3:
+                    return "구름많음";
+                case 4:
+                    return "흐림";
+            }
+        }else{
+            switch (wd.getRain()){
+                case 1:
+                    return "비";
+                case 2:
+                    return "비/눈";
+                case 3:
+                    return "눈";
+                case 4:
+                    return "소나기";
+                case 5:
+                    return "빗방울";
+                case 6:
+                    return "빗방울/눈날림";
+                case 7:
+                    return "눈날림";
+            }
+        }
+        return "";
     }
 
     /*

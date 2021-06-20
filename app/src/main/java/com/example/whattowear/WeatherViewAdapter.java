@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.ViewHolder> {
 
-    ArrayList<WeatherInfoData> itemViewArrayList = null; //객체배열
+    ArrayList<WeatherInfoData> itemViewArrayList = new ArrayList<WeatherInfoData>(); //객체배열
 
 //    public WeatherViewAdapter(Context context, ArrayList<WeatherInfoData> itemViewArrayList) {
 //        this.itemViewArrayList = itemViewArrayList;
@@ -30,15 +30,9 @@ public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.
 
             //뷰 객체에 대한 참조
 
-            tempItemView = itemView.findViewById(R.id.tempItemView);
-            rainItemView = itemView.findViewById(R.id.rainItemView);
-            timeItemView = itemView.findViewById(R.id.timeItemView);
-        }
-
-        public void setItem(WeatherInfoData weatherInfo) {
-            tempItemView.setText(Integer.toString(weatherInfo.getTempature()) );
-            rainItemView.setText(Integer.toString(weatherInfo.getRain()));
-            timeItemView.setText("임시");
+            tempItemView = (TextView) itemView.findViewById(R.id.tempItemView);
+            rainItemView = (TextView)itemView.findViewById(R.id.rainItemView);
+            timeItemView = (TextView)itemView.findViewById(R.id.timeItemView);
         }
     }
 
@@ -46,6 +40,8 @@ public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.
 
     //생성자에서 데이터 리스트 객체를 전달받음.
     WeatherViewAdapter(ArrayList<WeatherInfoData> list) {
+        Log.d("되라제발", "onBindViewHolder: 여기는 생성자");
+
         itemViewArrayList = list;
     }
 
@@ -58,6 +54,7 @@ public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.
 
         View view = inflater.inflate(R.layout.weather_recyclerview, parent, false);
         WeatherViewAdapter.ViewHolder vh = new WeatherViewAdapter.ViewHolder(view);
+        Log.d("되라제발", "onBindViewHolder: 여기는 온크리에이트");
 
         return vh;
     }
@@ -66,7 +63,10 @@ public class WeatherViewAdapter extends RecyclerView.Adapter<WeatherViewAdapter.
     @Override
     public void onBindViewHolder(WeatherViewAdapter.ViewHolder holder, int position) {
         WeatherInfoData weatherInfo = itemViewArrayList.get(position);
-        holder.setItem(weatherInfo);
+        Log.d("되라제발", "onBindViewHolder: 여기는 온바인드");
+        holder.tempItemView.setText(Integer.toString(weatherInfo.getTempature()) );
+        holder.rainItemView.setText(Integer.toString(weatherInfo.getRain()));
+        holder.timeItemView.setText(Integer.toString(weatherInfo.getTime()));
 
     }
 
