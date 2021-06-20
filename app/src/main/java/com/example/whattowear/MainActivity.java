@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -47,8 +48,10 @@ public class MainActivity extends AppCompatActivity {
 
     private GpsTracker gpsTracker;
     String key = "";
+    RecyclerView recyclerView;
 
     ArrayList<WeatherInfoData> widArray = new ArrayList<WeatherInfoData>();
+    ArrayList<WeatherInfoData> itemViewArrayList = new ArrayList<WeatherInfoData>();
 
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
@@ -62,6 +65,12 @@ public class MainActivity extends AppCompatActivity {
         ImageButton searchButton = (ImageButton)findViewById(R.id.searchButton);
         ImageButton settingButton = (ImageButton)findViewById(R.id.settingButton);
 
+        RecyclerView recyclerView = findViewById(R.id.weatherList) ;
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)) ;
+
+        // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
+        WeatherViewAdapter adapter = new WeatherViewAdapter(widArray) ;
+        recyclerView.setAdapter(adapter) ;
 
         //검색 아이콘 클릭
         searchButton.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +125,9 @@ public class MainActivity extends AppCompatActivity {
 
                 getXmlData();
 
+                WeatherViewAdapter adapter = new WeatherViewAdapter(widArray);
+                recyclerView.setAdapter(adapter);
+
                 for(int i = 0; i<widArray.size(); i++){
                     Log.d("여기는 런", "i = " + i);
                     Log.d("여기는 런"," 강수확률? " + widArray.get(i).getRainP() + " 입니다." );
@@ -125,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("여기는 런"," 풍속? " + widArray.get(i).getWindSpeed() + " 입니다." );
                     Log.d("여기는 런"," 날씨? " + widArray.get(i).getRain() + " 입니다." );
                 }
+
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -139,10 +152,22 @@ public class MainActivity extends AppCompatActivity {
                             result = 0;
                         }
 
+                        //메인 날씨 보여주기
                         rainPView.setText(Integer.toString(widArray.get(result).getRainP()));
                         tempView.setText(Integer.toString(widArray.get(result).getTempature()));
                         rainView.setText(Integer.toString(widArray.get(result).getRain()));
                         changeBackground();
+
+                        Log.d("TAG", "ㄴㅇㄹㄴㅇㄹㄴㅇㄹㄹㄴㅇ");
+
+
+
+                        //시간별 날시 보여주기
+                        // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
+//                        for (int i=0; i<widArray.size(); i++) {
+//                            itemViewArrayList.add(i, widArray.get(i));
+//                        }
+
                     }
                 });
             }
@@ -243,7 +268,6 @@ public class MainActivity extends AppCompatActivity {
                         tag = xpp.getName();
                         if (tag.equals("item")){
                             // 아이템 하나 끝
-                            //tmpItmes.add(new Item(hospitalName, hospitalAddr)); //api로 받아온 정보 객체로 저장. 이거를 itemArrayList에 저장.
                         }
                         break;
                 }
@@ -253,8 +277,6 @@ public class MainActivity extends AppCompatActivity {
         } catch(Exception e){
             Log.v("태그", "e = " + e);
         }
-        //임시 아이템을 items에게 넘겨줌
-        //itemArrayList = tmpItmes;
     }
 
     //날씨 배경 바꾸는 함수

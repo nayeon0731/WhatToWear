@@ -101,9 +101,10 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/weatherList"
         android:layout_width="309dp"
         android:layout_height="90dp"
-        android:orientation="horizontal"
+        android:background="@color/white1"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
